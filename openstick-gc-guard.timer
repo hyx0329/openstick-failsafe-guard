@@ -1,0 +1,10 @@
+[Unit] 
+Description=Runs the openstick-gc-guard.service 1 minute after boot up
+
+[Timer] 
+OnBootSec=1 m 
+Unit=openstick-gc-guard.service 
+
+[Install] 
+WantedBy=default.target
+

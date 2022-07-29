@@ -1,0 +1,11 @@
+[Unit] 
+Description=Test networking and regain access to the device
+
+[Service] 
+Type=oneshot
+User=root
+ExecStart=/usr/sbin/openstick-gc-guard.sh
+
+[Install] 
+WantedBy=multi-user.target
+

@@ -4,7 +4,7 @@ This is a fail-safe service for MSM8919 devices running debian with systemd.
 
 ## Main features
 
-+ If no network connection (wifi and usb gadget) 1 min after boot up,
++ If no network connection (wifi, ethernet or usb gadget) 1 min after boot up,
   the script will try to re-enable network connections.
   + If the device is connected to a host device, it'll try to activate
     the USB gadget mode.

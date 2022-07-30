@@ -3,11 +3,11 @@
 ## gadget mode if not connected.
 
 
-GADGET_CONTROL=/usr/bin/gc
-FAILSAFE_AP_CON=failsafe-ap
-FAILSAFE_AP_SSID=openstick-failsafe
+GADGET_CONTROL="/usr/bin/gc"
+FAILSAFE_AP_CON="failsafe-ap"
+FAILSAFE_AP_SSID="openstick-failsafe"
 FAILSAFE_AP_PASSWORD="12345678"
-FAILSAFE_AP_CHANNEL=3
+FAILSAFE_AP_CHANNEL="3"
 FAILSAFE_AP_ADDRESS="192.168.69.1/24"
 
 get_usb_role() {
@@ -15,31 +15,33 @@ get_usb_role() {
 }
 
 is_gadeget_mode() {
-  [ "gadget" = $(get_usb_role) ]
+  [ "gadget" = "$(get_usb_role)" ]
 }
 
 is_host_mode() {
-  [ "host" = $(get_usb_role) ]
+  [ "host" = "$(get_usb_role)" ]
 }
 
-is_usb_connected_host_mode() {
+is_usb_connected() {
   # get status from usb registers, return normal(0) if connected
+  # else suspended or disabled
   # following EHCI standard
-  CMP_VALUE=$(awk '/^PORTSC.*/{ a = strtonum("0x" $3); exit } END { b = and(a, 0x800); c = and(a, 0x80); if (or(b,c) == b) { print b } else { print 0 }  }' /sys/kernel/debug/usb/ci_hdrc.0/registers)
+  # 0x4 PE bit 1 mask
+  # 0x80 SUSP bit 1 mask
+
+  # PE | SUSP | STATUS
+  # 0  |  x   | Disabled
+  # 1  |  0   | Enabled(conncected)
+  # 1  |  1   | Suspended
+
+  # Connected to a HOST device in HOST mode is not considered connected,
+  # so it's safe to use this function to check current USB status.
+
+  CMP_VALUE=$(awk '/^PORTSC.*/{ a = strtonum("0x" $3); exit } END { b = and(a, 0x4); c = and(a, 0x80); if (c == 0) { print b } else { print 0 }  }' /sys/kernel/debug/usb/ci_hdrc.0/registers)
   if [ 0 -eq "$CMP_VALUE" ] ; then
     return 1  # not connected
   else
-    return 0  # in host mode, the device is connected if PE is ONE and SUSP is ZERO
-  fi
-}
-
-is_usb_connected_gadget_mode() {
-  # return normal(0) if usb is connected, assuming it's gadget mode
-  CMP_VALUE=$(awk '/^PORTSC.*/{ a = strtonum("0x" $3); exit } END { print and(a, 0x80); }' /sys/kernel/debug/usb/ci_hdrc.0/registers)
-  if [ 0 -eq "$CMP_VALUE" ] ; then
-    return 0  # in gadget mode, the device is connected if SUSP bit is ZERO
-  else
-    return 1
+    return 0  # connected
   fi
 }
 
@@ -60,7 +62,7 @@ is_device_online() {
   # if no error, the device is online
   if is_wifi_connected || is_ethernet_connected ; then
     return 0  # has wifi(AP/station), or USB ethernet card connected (NOT RNDIS gadget mode)
-  elif is_usb_net_connected && is_gadeget_mode && is_usb_connected_gadget_mode ; then
+  elif is_usb_net_connected && is_gadeget_mode && is_usb_connected ; then
     return 0  # gadget mode and connected
   else
     return 1  # well, offline, disconnected, whatever
@@ -73,11 +75,9 @@ setup_gadget_rndis_network() {
 
   # Test if host mode and connected to other gadget device.
   # If so, abort. So connected usb devices will still work.
-  #
-  # This won't block if device in host mode and connected
-  # to a host device. And under this situation, the device
-  # is set to gadget mode automatically.
-  if is_host_mode && is_usb_connected_host_mode ; then
+  # Note: connection to a host device in host mode is treated
+  # as disconnected, so don't worry about that.
+  if is_host_mode && is_usb_connected ; then
     return 1
   fi
 
@@ -87,10 +87,11 @@ setup_gadget_rndis_network() {
   $GADGET_CONTROL -a rndis  # RNDIS network adapter
   $GADGET_CONTROL -e        # enable gadget
   if nmcli connection up USB ; then
-    # Linked up using default configuration
+    # Linked up using default configuration.
     return 0
   else
-    # Failed, either missing configuration or USB failure
+    # Failed, either missing connection configuration
+    # named USB in NetworkManager, or a potential USB failure.
     return 1
   fi
 }

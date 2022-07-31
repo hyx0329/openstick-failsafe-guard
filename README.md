@@ -38,7 +38,7 @@ chmod +x /usr/sbin/openstick-gc-guard.sh
 systemctl enable openstick-gc-guard.timer
 ```
 
-### reset-button-monitor
+### openstick-button-monitor
 
 ```bash
 apt install -y bsdmainutils bc  # required: hexdump, bc(calculator)

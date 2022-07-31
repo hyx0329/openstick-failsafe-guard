@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenStick Button Monitor Service
+
+[Service]
+Type=simple
+User=root
+ExecStart=systemd-inhibit \
+          --what="handle-reboot-key" \
+          --who="OpenStick Button Monitor Service" \
+          --why="Take over KEY_RESET" \
+          /usr/sbin/openstick-button-monitor.sh
+TimeoutStopSec=infinity
+Restart=always
+
+[Install]
+WantedBy=default.target
+

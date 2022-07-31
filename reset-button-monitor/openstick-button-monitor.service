@@ -3,7 +3,6 @@ Description=OpenStick Button Monitor Service
 
 [Service]
 Type=simple
-User=root
 ExecStart=systemd-inhibit \
           --what="handle-reboot-key" \
           --who="OpenStick Button Monitor Service" \

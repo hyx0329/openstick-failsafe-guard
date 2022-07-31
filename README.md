@@ -49,6 +49,10 @@ systemctl enable --now openstick-button-monitor.service
 
 You might want to edit the environment variables through systemd to
 define your button behavior. Defaults to do nothing except logging.
+
+### How to modify the environment variables in systemd service
+
+see https://serverfault.com/questions/413397/how-to-set-environment-variable-in-systemd-service
  
 ## TODOs
 

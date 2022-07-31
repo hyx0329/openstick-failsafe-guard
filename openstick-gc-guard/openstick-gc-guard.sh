@@ -2,13 +2,16 @@
 ## A program detects network connection and reinitiate USB
 ## gadget mode if not connected.
 
+# Change variables below in a systemd service overlay.
+# command: systemctl --edit openstick-gc-guard.service
 
-GADGET_CONTROL="/usr/bin/gc"
-FAILSAFE_AP_CON="failsafe-ap"
-FAILSAFE_AP_SSID="openstick-failsafe"
-FAILSAFE_AP_PASSWORD="12345678"
-FAILSAFE_AP_CHANNEL="3"
-FAILSAFE_AP_ADDRESS="192.168.69.1/24"
+GADGET_CONTROL=${GADGET_CONTROL:-"/usr/bin/gc"}
+FAILSAFE_AP_CON=${FAILSAFE_AP_CON:-"failsafe-ap"}
+FAILSAFE_AP_SSID=${FAILSAFE_AP_SSID:-"openstick-failsafe"}
+FAILSAFE_AP_PASSWORD=${FAILSAFE_AP_PASSWORD:-"12345678"}
+FAILSAFE_AP_CHANNEL=${FAILSAFE_AP_CHANNEL:-"3"}
+FAILSAFE_AP_ADDRESS=${FAILSAFE_AP_ADDRESS:-"192.168.69.1/24"}
+
 
 get_usb_role() {
   cat /sys/kernel/debug/usb/ci_hdrc.0/role

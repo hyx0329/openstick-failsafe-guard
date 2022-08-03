@@ -106,7 +106,7 @@ setup_failsafe_ap() {
   # it seems a password is required or NM just fails TvT
 
   # delete old connection anyway
-  nmcli connection delete $FAILSAFE_AP_CON > /dev/null
+  nmcli connection delete "$FAILSAFE_AP_CON" > /dev/null
 
   # setup connection
   # note: ipv4.method must be shared or will be likely to

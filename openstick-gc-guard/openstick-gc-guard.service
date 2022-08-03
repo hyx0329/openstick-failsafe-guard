@@ -1,5 +1,5 @@
 [Unit] 
-Description=Test networking and regain access to the device
+Description=Network testing and failsafe actions
 
 [Service] 
 Type=oneshot

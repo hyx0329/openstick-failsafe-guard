@@ -24,10 +24,6 @@ enable_sim() {
 
 main() {
   enable_sim "$SIM_ENABLED"
-
-  # Wait a few seconds before SIM card powered up.
-  # This is required or you have to manually restart ModemManager.
-  sleep 5
 }
 
 main

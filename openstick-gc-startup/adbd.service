@@ -1,0 +1,10 @@
+[Unit]
+Description=ADB Daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/adbd
+Restart=on-failure
+
+[Install]
+

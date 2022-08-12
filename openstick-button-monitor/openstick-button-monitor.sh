@@ -107,10 +107,16 @@ handle_key_up_event() {
   # if a long press, test if time delay enough
   case $EVENT_LONG_PRESS in
     (0)
-      do_action_short "$1" "$2"
+      if ! do_action_short "$1" "$2" ; then
+        logger "Error occured when executing short press action!"
+      fi
       ;;
     (1)
-      test_action_long "$1" "$2" && do_action_long "$1" "$2"
+      if test_action_long "$1" "$2" ; then
+        if ! do_action_long "$1" "$2" ; then
+          logger "Error occured when executing long press action!"
+        fi
+      fi
       ;;
   esac
 }

@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenStick Change SIM at Startup
+Before=ModemManager.service
+
+[Service]
+Type=oneshot
+# Set this environment variable to the sim control pin's name's prefix.
+# For example, if you need to enable sim card controlled by
+# "/sys/class/leds/sim0_sel", you can set it to "SIM_ENABLED='sim0_sel'",
+# or "SIM_ENABLED='sim0'", or other values that won't conflict the others.
+Environment="SIM_ENABLED=sim0"
+ExecStart=/usr/sbin/openstick-sim-changer.sh
+Restart=no
+
+[Install]
+WantedBy=default.target
+

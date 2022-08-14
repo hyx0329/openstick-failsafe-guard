@@ -39,3 +39,5 @@ install-basics : install-startup-diagnose install-button-monitor install-gc-star
 
 install-all : install-basics install-sim-changer install-sshkey-regen install-expanddisk
 
+.DEFAULT : install-basics
+

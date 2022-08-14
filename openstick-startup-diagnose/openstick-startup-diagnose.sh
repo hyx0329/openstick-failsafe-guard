@@ -72,6 +72,38 @@ is_device_online() {
   fi
 }
 
+is_modem_crashed() {
+  if dmesg | grep -- "crash detected in 4080000.remoteproc" > /dev/null ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+is_modemmanager_running() {
+  if systemctl status ModemManager | grep -- "Active: active (running)" > /dev/null ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+is_modem_registered() {
+  if mmcli -L | grep -- "/org/freedesktop/ModemManager1/Modem" > /dev/null ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+has_modem_interface() {
+  if test -e /dev/wwan0qmi0 ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 setup_gadget_rndis_network() {
   # Setup the usb gadget internet interface if device is not
   # connected to any USB gadgets as a host.
@@ -130,7 +162,11 @@ setup_serial_ttyMSM0() {
   [ -e /dev/ttyMSM0 ] && systemctl enable --now getty@ttyMSM0.service
 }
 
-main() {
+restart_modemmanager() {
+  systemctl restart ModemManager
+}
+
+diagnose_network() {
   if is_device_online ; then
     logger "Device online, good to go."
     return 0  # device online
@@ -151,6 +187,41 @@ main() {
   logger "Activating fail-safe AP"
   setup_failsafe_ap
 }
+
+diagnose_modem() {
+  # The modems on MSM8916 platforms may reset themselves if using a sim
+  # card from some carriers. The log says "THIS IS INTENTIONAL RESET,
+  # NO RAMDUMP EXPECTED", but the system treat it as crashed. ModemManager
+  # disable the QMI interface after the qmi-proxy's connection broken,
+  # and will not recover without a service restart. This could be a MM's
+  # bug but for the momemnt, there's no easy way to work around.
+
+  if is_modem_crashed ; then
+    logger "Oops, it seems the modem crashed before, will investigate."
+  fi
+
+  if is_modemmanager_running ; then
+    if has_modem_interface && ! is_modem_registered ; then
+      logger "Modem is not registered by ModemManager, possibly missed."
+      logger "Try to recover by restarting the service."
+      restart_modemmanager
+      return
+    fi
+  fi
+
+  logger "Modem looks fine, no action taken."
+}
+
+main() {
+  logger "Network diagnose start."
+  diagnose_network
+  logger "Network diagnose complete."
+
+  logger "Modem diagnose start."
+  diagnose_modem
+  logger "Modem diagnose complete."
+}
+
 
 # start routine
 main

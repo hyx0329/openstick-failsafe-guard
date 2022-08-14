@@ -7,9 +7,9 @@ runs better.
 
 ## Main features and usages
  
-### openstick-gc-guard
+### openstick-startup-diagnose
 
-+ If no network connection (wifi, ethernet or usb gadget) 1 min after boot up,
++ If no network connection (wifi, ethernet or usb gadget) is detected,
   the script will try to re-enable network connections.
   + If the device is connected to a host device, it'll try to activate
     the USB gadget mode.
@@ -21,6 +21,9 @@ runs better.
     at `/dev/ttyMSM0`
     + Access Point's name defaults to `openstick-failsafe`, and password is
       `12345678`
++ Test if modem is working as expected. If not, try to recover by restarting
+  ModemManager.
++ Executed 1 min after boot up.
 
 __WARNING: If you set up a CUSTOM AP, the SCRIPT will assume that the device is ONLINE! So please remember your AP's password!__
 
@@ -37,7 +40,8 @@ systemctl enable openstick-gc-guard.timer
 ### reset button monitor
 
 Monitor the reset button and trigger relevant actions. The defined action will be
-excuted using `eval`(in posix shell).
+excuted directly(in posix shell). If you decide to modify the action to "exit 0",
+it will exit.
 
 #### usage
 
@@ -63,10 +67,12 @@ Enable the service and edit the Environment in the service unit script.
 ### openstick-sim-changer
 
 Switch sim card according to the configuration at startup, for UFI001/UFI003
-series. This also ensures the sim card is fully powered up so ModemManager
-don't need to be restarted after boot up. Note that I'm not aware of any method
-to reload the sim card info without a reboot, so I created this service to
-switch the sim cards before ModemManager startup.
+series. ~~This also ensures the sim card is fully powered up so ModemManager
+don't need to be restarted after boot up.~~ That's a complicated issue.
+
+Note that I'm not aware of any method to reload the sim card info without a
+reboot, so I created this service to switch the sim cards before ModemManager
+initialize the modem.
 
 #### usage
 

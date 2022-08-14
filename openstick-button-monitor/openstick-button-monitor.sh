@@ -70,7 +70,8 @@ action_enable_rndis_and_adb() {
 }
 
 do_action_short() {
-  eval "$PRESS_ACTION_SHORT"
+  $PRESS_ACTION_SHORT
+  return $?
 }
 
 test_action_long() {
@@ -84,7 +85,8 @@ test_action_long() {
 }
 
 do_action_long() {
-  eval "$PRESS_ACTION_LONG"
+  $PRESS_ACTION_LONG
+  return $?
 }
 
 do_monitor_key_event() {
@@ -107,15 +109,21 @@ handle_key_up_event() {
   # if a long press, test if time delay enough
   case $EVENT_LONG_PRESS in
     (0)
-      if ! do_action_short "$1" "$2" ; then
-        logger "Error occured when executing short press action!"
+      do_action_short "$1" "$2"
+      CODE=$?
+      if [ 0 -ne $CODE ] ; then
+        logger "Error occured when executing short press action! code=$CODE"
       fi
       ;;
     (1)
       if test_action_long "$1" "$2" ; then
-        if ! do_action_long "$1" "$2" ; then
-          logger "Error occured when executing long press action!"
+        do_action_long "$1" "$2"
+        CODE=$?
+        if [ 0 -ne $CODE ] ; then
+          logger "Error occured when executing long press action! code=$CODE"
         fi
+      else
+        logger "Press time not long enough to trigger the long press action."
       fi
       ;;
   esac

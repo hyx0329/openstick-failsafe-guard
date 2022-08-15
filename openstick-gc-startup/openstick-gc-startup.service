@@ -1,6 +1,6 @@
 [Unit]
 Description=OpenStick Gadget Control Startup Service
-Before=openstick-gc-guard.service
+Before=openstick-startup-diagnose.service
 
 [Service]
 Type=oneshot

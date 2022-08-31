@@ -12,16 +12,34 @@ FAILSAFE_AP_CHANNEL=${FAILSAFE_AP_CHANNEL:-"3"}
 FAILSAFE_AP_ADDRESS=${FAILSAFE_AP_ADDRESS:-"192.168.69.1/24"}
 GC_MODE=${GC_MODE-""}
 
+USB_ROLE_DEBUG=/sys/kernel/debug/usb/ci_hdrc.0/role
+
 get_usb_role() {
-  cat /sys/kernel/debug/usb/ci_hdrc.0/role
+  cat ${USB_ROLE_DEBUG}
 }
 
-is_gadeget_mode() {
+is_gadget_mode() {
   [ "gadget" = "$(get_usb_role)" ]
 }
 
 is_host_mode() {
   [ "host" = "$(get_usb_role)" ]
+}
+
+set_usb_mode() {
+  if [ "$1" = $(get_usb_role) ]; then
+    return
+  fi
+  echo $1 > ${USB_ROLE_DEBUG}
+  return $?
+}
+
+set_usb_gadget_mode() {
+  set_usb_mode "gadget"
+}
+
+set_usb_host_mode() {
+  set_usb_mode "host"
 }
 
 is_usb_connected() {
@@ -64,7 +82,7 @@ is_device_online() {
   # if no error, the device is online
   if is_wifi_connected || is_ethernet_connected ; then
     return 0  # has wifi(AP/station), or USB ethernet card connected (NOT RNDIS gadget mode)
-  elif is_usb_net_connected && is_gadeget_mode && is_usb_connected ; then
+  elif is_usb_net_connected && is_gadget_mode && is_usb_connected ; then
     return 0  # gadget mode and connected
   else
     return 1  # well, offline, disconnected, whatever
@@ -152,6 +170,10 @@ setup_serial_ttyMSM0() {
 }
 
 main() {
+  # force usb host mode enabled by default
+  set_usb_host_mode
+
+  # enable gadget interfaces if defined
   if [ -n "${GC_MODE}" ] ; then
     logger "Setting up gadgets: $GC_MODE"
     setup_gadget_mode

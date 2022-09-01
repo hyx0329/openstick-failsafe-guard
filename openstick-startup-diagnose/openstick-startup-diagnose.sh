@@ -13,7 +13,8 @@ FAILSAFE_AP_CHANNEL=${FAILSAFE_AP_CHANNEL:-"3"}
 FAILSAFE_AP_ADDRESS=${FAILSAFE_AP_ADDRESS:-"192.168.69.1/24"}
 
 # make sure the output is English
-export LANG=C.utf8
+unset LANGUAGES
+export LANG=C
 
 get_usb_role() {
   cat /sys/kernel/debug/usb/ci_hdrc.0/role

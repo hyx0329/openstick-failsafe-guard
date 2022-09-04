@@ -16,8 +16,12 @@ FAILSAFE_AP_ADDRESS=${FAILSAFE_AP_ADDRESS:-"192.168.69.1/24"}
 unset LANGUAGES
 export LANG=C
 
+USB_DEBUG=/sys/kernel/debug/usb/ci_hdrc.0
+USB_ROLE_DEBUG=$USB_DEBUG/role
+USB_REGISTER_DEBUG=$USB_DEBUG/registers
+
 get_usb_role() {
-  cat /sys/kernel/debug/usb/ci_hdrc.0/role
+  cat ${USB_ROLE_DEBUG}
 }
 
 is_gadget_mode() {
@@ -26,6 +30,24 @@ is_gadget_mode() {
 
 is_host_mode() {
   [ "host" = "$(get_usb_role)" ]
+}
+
+set_usb_mode() {
+  CURRENT_USB_ROLE=$(get_usb_role)
+  logger "Changing USB from $CURRENT_USB_ROLE mode to $1 mode"
+  if [ "$1" = $(get_usb_role) ]; then
+    return
+  fi
+  echo $1 > ${USB_ROLE_DEBUG}
+  return $?
+}
+
+set_usb_gadget_mode() {
+  set_usb_mode "gadget"
+}
+
+set_usb_host_mode() {
+  set_usb_mode "host"
 }
 
 is_usb_connected() {
@@ -43,7 +65,7 @@ is_usb_connected() {
   # Connected to a HOST device in HOST mode is not considered connected,
   # so it's safe to use this function to check current USB status.
 
-  CMP_VALUE=$(awk '/^PORTSC.*/{ a = strtonum("0x" $3); exit } END { b = and(a, 0x4); c = and(a, 0x80); if (c == 0) { print b } else { print 0 }  }' /sys/kernel/debug/usb/ci_hdrc.0/registers)
+  CMP_VALUE=$(gawk '/^PORTSC.*/{ a = strtonum("0x" $3); exit } END { b = and(a, 0x4); c = and(a, 0x80); if (c == 0) { print b } else { print 0 }  }' ${USB_REGISTER_DEBUG})
   if [ 0 -eq "$CMP_VALUE" ] ; then
     return 1  # not connected
   else
@@ -119,7 +141,8 @@ setup_gadget_rndis_network() {
     return 1
   fi
 
-  echo "gadget" > /sys/kernel/debug/usb/ci_hdrc.0/role
+  set_usb_gadget_mode
+
   $GADGET_CONTROL -d        # disable all
   $GADGET_CONTROL -c        # cleanup
   $GADGET_CONTROL -a rndis  # RNDIS network adapter

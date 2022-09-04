@@ -20,7 +20,7 @@ get_usb_role() {
   cat /sys/kernel/debug/usb/ci_hdrc.0/role
 }
 
-is_gadeget_mode() {
+is_gadget_mode() {
   [ "gadget" = "$(get_usb_role)" ]
 }
 
@@ -68,7 +68,7 @@ is_device_online() {
   # if no error, the device is online
   if is_wifi_connected || is_ethernet_connected ; then
     return 0  # has wifi(AP/station), or USB ethernet card connected (NOT RNDIS gadget mode)
-  elif is_usb_net_connected && is_gadeget_mode && is_usb_connected ; then
+  elif is_usb_net_connected && is_gadget_mode && is_usb_connected ; then
     return 0  # gadget mode and connected
   else
     return 1  # well, offline, disconnected, whatever

@@ -133,15 +133,15 @@ handle_key_down_event() {
   # set key down time (start time)
   export EVENT_TIME_START="$1"
   export EVENT_LONG_PRESS=0
+}
+
+handle_key_long_press_event() {
+  export EVENT_LONG_PRESS=1
   if test_action_long "$1" "$2"; then
     set_led off
   else
     set_led on
   fi
-}
-
-handle_key_long_press_event() {
-  export EVENT_LONG_PRESS=1
 }
 
 handle_key_event() {

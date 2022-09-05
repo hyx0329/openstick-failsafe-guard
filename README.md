@@ -5,6 +5,16 @@ help playing with MSM8916 sticks. Some are fail-safe services to regain
 access to the device, the others may be utilities to help the system
 runs better.
 
+## how to create deb packages
+
+Just run (on a system with dpkg-deb)
+
+```sh
+make all-deb
+```
+
+then you'll find the packages at the root of the repo.
+
 ## Main features and usages
  
 ### openstick-startup-diagnose
@@ -93,5 +103,5 @@ see https://serverfault.com/questions/413397/how-to-set-environment-variable-in-
 + [ ] enable a Bluetooth network interface
 + [x] enable ADB interface
 + [x] use environment variables defined in the service script
-+ [ ] packaging(deb)
++ [x] packaging(deb)
 

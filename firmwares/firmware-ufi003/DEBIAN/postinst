@@ -1,0 +1,4 @@
+chmod a+x /usr/lib/firmware
+
+exit 0
+

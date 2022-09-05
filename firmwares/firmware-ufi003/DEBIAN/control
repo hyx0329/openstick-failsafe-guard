@@ -1,0 +1,5 @@
+Package: openstick-firmware
+Version: 1.0
+Maintainer: hyx0329@163.com
+Architecture: all
+Description: Original firmware from MSM8916 dongle (UFI003 version).

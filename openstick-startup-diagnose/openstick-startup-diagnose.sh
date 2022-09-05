@@ -86,12 +86,36 @@ is_usb_net_connected() {
   nmcli device | awk '{print $1, $2, $3}' | grep -E -- "usb" | grep " connected" > /dev/null
 }
 
+is_adbd_running() {
+  pgrep adbd
+}
+
+is_gadget_has_rndis() {
+  ${GADGET_CONTROL} -l | grep -- "type: rndis" > /dev/null
+  return $?
+}
+
+add_usb_net() {
+  nmcli con del usb-failsafe
+  nmcli con add \
+    type ethernet ifname usb0 con-name "usb-failsafe" \
+    ipv4.addresses "192.168.68.1/24" \
+    ipv4.method shared autoconnect yes
+}
+
 is_device_online() {
   # if no error, the device is online
   if is_wifi_connected || is_ethernet_connected ; then
     return 0  # has wifi(AP/station), or USB ethernet card connected (NOT RNDIS gadget mode)
   elif is_usb_net_connected && is_gadget_mode && is_usb_connected ; then
     return 0  # gadget mode and connected
+  elif is_gadget_mode && is_usb_connected && is_adbd_running && is_gadget_has_rndis ; then
+    # has rndis interface, adbd is running, but no usb ethernet
+    # activate it and return OK
+    # it's ok to fail here
+    add_usb_net
+    nmcli con up usb-failsafe
+    return 0
   else
     return 1  # well, offline, disconnected, whatever
   fi
@@ -147,12 +171,14 @@ setup_gadget_rndis_network() {
   $GADGET_CONTROL -c        # cleanup
   $GADGET_CONTROL -a rndis  # RNDIS network adapter
   $GADGET_CONTROL -e        # enable gadget
-  if nmcli connection up USB ; then
+
+  add_usb_net
+
+  if nmcli connection up usb-failsafe ; then
     # Linked up using default configuration.
     return 0
   else
     # Failed, either missing connection configuration
-    # named USB in NetworkManager, or a potential USB failure.
     return 1
   fi
 }

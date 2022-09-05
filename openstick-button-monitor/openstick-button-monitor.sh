@@ -4,7 +4,7 @@ DEFAULT_EV_INPUT=$(readlink -f /dev/input/by-path/platform-gpio-keys-event)
 DEFAULT_EV_KEY_CODE=408  # KEY_RESET
 DEFAULT_PRESS_LONG_DELAY=5  # second
 DEFAULT_ACTION_SHORT="logger default short press action"
-DEFAULT_ACTION_LONG="logger default long press action"
+DEFAULT_ACTION_LONG="action_enable_failsafe_ap"
 
 EV_INPUT=${EV_INPUT:-$DEFAULT_EV_INPUT}
 EV_KEY_CODE=${EV_KEY_CODE:-$DEFAULT_EV_KEY_CODE}
@@ -12,7 +12,7 @@ PRESS_LONG_DELAY=${PRESS_LONG_DELAY:-$DEFAULT_PRESS_LONG_DELAY}
 PRESS_ACTION_SHORT=${PRESS_ACTION_SHORT:-$DEFAULT_ACTION_SHORT}
 PRESS_ACTION_LONG=${PRESS_ACTION_LONG:-$DEFAULT_ACTION_LONG}
 # This one below can be overwritten to a plain value
-INDICATOR_LED=${INDICATOR_LED-"/sys/class/leds/green:internet/brightness"}
+INDICATOR_LED=${INDICATOR_LED-"/sys/class/leds/green:/brightness"}
 
 # copied from openstick-gc-guard
 FAILSAFE_AP_CON=${FAILSAFE_AP_CON:-"failsafe-ap"}
@@ -133,7 +133,11 @@ handle_key_down_event() {
   # set key down time (start time)
   export EVENT_TIME_START="$1"
   export EVENT_LONG_PRESS=0
-  set_led on
+  if test_action_long "$1" "$2"; then
+    set_led off
+  else
+    set_led on
+  fi
 }
 
 handle_key_long_press_event() {

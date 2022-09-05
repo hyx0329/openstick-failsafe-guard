@@ -1,0 +1,16 @@
+[Unit]
+Description=OpenStick Gadget Control Startup Service
+Before=openstick-startup-diagnose.service
+
+[Service]
+Type=oneshot
+# provide a list of interfaces to be enabled, separated by commas, eg. "GC_MODE=rndis,ffs,serial"
+# Valid values are "serial ffs hid midi printer uvc mass rndis ecm acm"
+# make sure rndis is the first when using with Windows
+Environment="GC_MODE=rndis,ffs"
+ExecStart=/usr/sbin/openstick-gc-manager.sh startup
+Restart=no
+
+[Install]
+WantedBy=default.target
+

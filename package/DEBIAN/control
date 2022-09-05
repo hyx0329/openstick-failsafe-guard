@@ -1,0 +1,6 @@
+Package: openstick-utils
+Version: 1.0
+Maintainer: hyx0329@163.com
+Architecture: arm64
+Description: A bunch of utilities for MSM8916 dongles running Debian.
+Depends: bash, coreutils, gawk, bc, bsdmainutils

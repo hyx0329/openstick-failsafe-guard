@@ -7,7 +7,7 @@ runs better.
 
 ## how to create deb packages
 
-Just run (on a system with dpkg-deb)
+Just run (on a system with dpkg-deb, fakeroot, gnumake)
 
 ```sh
 make all-deb
@@ -63,7 +63,11 @@ systemctl enable --now openstick-button-monitor.service
 ```
 
 You might want to edit the environment variables through systemd to
-define your button behavior. Defaults to do nothing except logging.
+define your button behavior. ~~Defaults to do nothing except logging.~~
+Long-press behavior changed to activate the failsafe access point.
+
+With supported kernel, the led will on while the button is pressed,
+until the long-press time threshold has been exceeded.
 
 ### openstick-gc-startup
 
@@ -103,5 +107,6 @@ see https://serverfault.com/questions/413397/how-to-set-environment-variable-in-
 + [ ] enable a Bluetooth network interface
 + [x] enable ADB interface
 + [x] use environment variables defined in the service script
-+ [x] packaging(deb)
-
++ [ ] packaging(deb)
+  - [x] packed in package
+  - [ ] follow packaging guide?

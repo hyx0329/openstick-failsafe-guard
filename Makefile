@@ -43,6 +43,8 @@ install-binaries :
 
 install-basics : install-startup-diagnose install-button-monitor install-gc-manager
 
+install-basics-with-binaries : install-basics install-binaries
+
 install-all : install-basics install-sim-changer install-sshkey-regen install-expanddisk install-binaries
 
 firmware-%.deb :
@@ -51,18 +53,24 @@ firmware-%.deb :
 
 create-firmwares-deb : firmware-ufi001c.deb firmware-ufi003.deb
 
-openstick-utils.deb :
-	cp -r package openstick-utils
-	fakeroot -- sh -c "PREFIX=./openstick-utils $(MAKE) install-all && dpkg-deb --build openstick-utils"
+openstick-utils-%.deb :
+	export POSTFIX=$(subst openstick-utils-,,$(subst .deb,,$@)); \
+	cp -r package openstick-utils-$${POSTFIX}; \
+	fakeroot -- sh -c "PREFIX=./openstick-utils-$${POSTFIX} $(MAKE) install-$${POSTFIX} && dpkg-deb --build openstick-utils-$${POSTFIX}" ;\
+	rm -rf openstick-utils-$${POSTFIX}
 
-create-deb : openstick-utils.deb
+create-deb : openstick-utils-all.deb
 
-all-deb : create-deb create-firmwares-deb
+create-deb-basics : openstick-utils-basics.deb
+
+create-deb-basics-with-binaries : openstick-utils-basics-with-binaries.deb
+
+all-deb : create-deb create-deb-basics create-firmwares-deb create-deb-basics-with-binaries
 
 clean-deb :
 	-rm -f *.deb
 	-rm -f firmwares/*.deb
-	-rm -rf openstick-utils
+	-rm -rf openstick-utils-*
 
 .DEFAULT : install-basics
 

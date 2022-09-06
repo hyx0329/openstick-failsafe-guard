@@ -1,11 +1,11 @@
 #!/bin/bash
 
-systemctl enable openstick-startup-diagnose.timer
-systemctl enable openstick-button-monitor.service
-systemctl enable openstick-gc-startup.service
-systemctl enable openstick-sim-changer.service
-systemctl enable regenerate-ssh-host-keys.service
-systemctl enable openstick-expanddisk-startup.service
+echo "Try to enable installed services"
 
-echo "install complete!"
+for serv in openstick-startup-diagnose.timer openstick-button-monitor.service openstick-gc-startup.service openstick-sim-changer.service regenerate-ssh-host-keys.service openstick-expanddisk-startup.service; do
+  if [ -e "/etc/systemd/system/$serv" ]; then
+    systemctl enable $serv
+  fi
+done
+
 exit 0

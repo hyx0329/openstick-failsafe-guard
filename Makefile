@@ -21,7 +21,7 @@ install-button-monitor :
 install-gc-manager :
 	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-gc-manager/*.service 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-gc-manager/*.sh 
-	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-gc-manager.service; fi
+	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-gc-startup.service; fi
 
 install-sim-changer :
 	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-sim-changer/*.service 

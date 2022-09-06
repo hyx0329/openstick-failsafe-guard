@@ -16,9 +16,11 @@ FAILSAFE_AP_ADDRESS=${FAILSAFE_AP_ADDRESS:-"192.168.69.1/24"}
 unset LANGUAGES
 export LANG=C
 
+UDC_SYSFS=/sys/class/udc/ci_hdrc.0
 USB_DEBUG=/sys/kernel/debug/usb/ci_hdrc.0
-USB_ROLE_DEBUG=$USB_DEBUG/role
+USB_ROLE_DEBUG=$UDC_SYSFS/device/role
 USB_REGISTER_DEBUG=$USB_DEBUG/registers
+CONFIGFS_GADGET=/sys/kernel/config/usb_gadget
 
 get_usb_role() {
   cat ${USB_ROLE_DEBUG}
@@ -35,10 +37,10 @@ is_host_mode() {
 set_usb_mode() {
   CURRENT_USB_ROLE=$(get_usb_role)
   logger "Changing USB from $CURRENT_USB_ROLE mode to $1 mode"
-  if [ "$1" = $(get_usb_role) ]; then
+  if [ "$1" = "$CURRENT_USB_ROLE" ]; then
     return
   fi
-  echo $1 > ${USB_ROLE_DEBUG}
+  echo "$1" > ${USB_ROLE_DEBUG}
   return $?
 }
 
@@ -50,7 +52,7 @@ set_usb_host_mode() {
   set_usb_mode "host"
 }
 
-is_usb_connected() {
+is_usb_connected_legacy() {
   # get status from usb registers, return normal(0) if connected
   # else suspended or disabled
   # following EHCI standard
@@ -70,6 +72,19 @@ is_usb_connected() {
     return 1  # not connected
   else
     return 0  # connected
+  fi
+}
+
+is_usb_connected() {
+  if is_gadget_mode; then
+    if [ "configured" = "$(cat ${UDC_SYSFS}/state)" ]; then
+      return 0  # connected
+    else
+      return 1  # disconnected
+    fi
+  elif is_host_mode; then
+    is_usb_connected_legacy
+    return $?
   fi
 }
 

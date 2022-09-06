@@ -17,11 +17,9 @@ unset LANGUAGES
 export LANG=C
 
 UDC_SYSFS=/sys/class/udc/ci_hdrc.0
-
 USB_DEBUG=/sys/kernel/debug/usb/ci_hdrc.0
 USB_ROLE_DEBUG=$UDC_SYSFS/device/role
 USB_REGISTER_DEBUG=$USB_DEBUG/registers
-
 CONFIGFS_GADGET=/sys/kernel/config/usb_gadget
 
 load_modules() {
@@ -69,7 +67,7 @@ set_usb_mode() {
   if [ "$1" = "$CURRENT_USB_ROLE" ]; then
     return
   fi
-  echo $1 > ${USB_ROLE_DEBUG}
+  echo "$1" > ${USB_ROLE_DEBUG}
   return $?
 }
 

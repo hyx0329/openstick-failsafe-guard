@@ -8,32 +8,32 @@ ENABLE ?= 0
 .PHONY : install-sshkey-regen install-expanddisk
 
 install-startup-diagnose :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-startup-diagnose/*.service 
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-startup-diagnose/*.timer 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-startup-diagnose/*.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-startup-diagnose/*.timer 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-startup-diagnose/*.sh 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-startup-diagnose.timer; fi
 
 install-button-monitor :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-button-monitor/*.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-button-monitor/*.service 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-button-monitor/*.sh 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-button-monitor.service; fi
 
 install-gc-manager :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-gc-manager/*.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-gc-manager/*.service 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-gc-manager/*.sh 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-gc-startup.service; fi
 
 install-sim-changer :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-sim-changer/*.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-sim-changer/*.service 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-sim-changer/*.sh 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-sim-changer.service; fi
 
 install-sshkey-regen :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ regenerate-ssh-host-keys.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ regenerate-ssh-host-keys.service 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable regenerate-ssh-host-keys.service; fi
 
 install-expanddisk :
-	install -D -o root -g root -m 644 -t $(PREFIX)/etc/systemd/system/ openstick-expanddisk-startup/*.service 
+	install -D -o root -g root -m 644 -t $(PREFIX)/usr/lib/systemd/system/ openstick-expanddisk-startup/*.service 
 	install -D -o root -g root -m 755 -t $(PREFIX)/usr/sbin/ openstick-expanddisk-startup/*.sh 
 	if [ 1 -eq $(ENABLE) ]; then systemctl enable openstick-expanddisk-startup.service; fi
 

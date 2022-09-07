@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for serv in openstick-startup-diagnose.timer openstick-button-monitor.service openstick-gc-startup.service openstick-sim-changer.service regenerate-ssh-host-keys.service openstick-expanddisk-startup.service; do
-  if [ -e "/etc/systemd/system/$serv" ]; then
+  if [ -e "/usr/lib/systemd/system/$serv" ]; then
     deb-systemd-helper enable $serv
   fi
 done

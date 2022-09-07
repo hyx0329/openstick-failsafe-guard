@@ -3,4 +3,5 @@ Version: 1.0
 Maintainer: hyx0329@163.com
 Architecture: arm64
 Description: A bunch of utilities for MSM8916 dongles running Debian.
-Depends: coreutils, network-manager, modemmanager, initramfs-tools, bc, bsdmainutils, gawk, rmtfs, qrtr-tools
+Depends: coreutils, network-manager, modemmanager, bc, bsdmainutils, gawk
+Suggests: initramfs-tools, rmtfs, qrtr-tools

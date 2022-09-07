@@ -1,11 +1,14 @@
 #!/bin/bash
 
-echo "Try to enable installed services"
-
 for serv in openstick-startup-diagnose.timer openstick-button-monitor.service openstick-gc-startup.service openstick-sim-changer.service regenerate-ssh-host-keys.service openstick-expanddisk-startup.service; do
   if [ -e "/etc/systemd/system/$serv" ]; then
-    systemctl enable $serv
+    deb-systemd-helper enable $serv
   fi
 done
 
+if ! deb-systemd-helper is-enabled rmtfs.service; then
+  echo "It's recommended to install rmtfs and qrtr-tools, and enable rmtfs.service."
+fi
+
 exit 0
+

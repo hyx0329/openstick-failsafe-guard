@@ -1,0 +1,29 @@
+name: Automatic CI release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare environment
+        run: sudo apt install -y fakeroot dpkg make
+
+      - name: Checking out repository
+        uses: actions/checkout@v3
+
+      - name: Build packages
+        run: make all-deb
+
+      - name: Get release info
+        id: release-info
+      
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          body: ${{ steps.release-info.outputs.git-tag-annotation }}
+          artifacts: "*.deb"
+
